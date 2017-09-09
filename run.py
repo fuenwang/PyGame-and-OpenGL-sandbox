@@ -73,11 +73,11 @@ def main():
     [points, colors] = InitMap(data)
 
     pg.init()
-    display = (1080, 720)
+    display = (1920, 980)
     pg.display.set_mode(display, DOUBLEBUF | OPENGL)
     
-    gluPerspective(60, 1080.0/720, 0.1, 1500)
-    glTranslatef(150, 150, -1000)
+    gluPerspective(60, float(display[0]) / display[1], 0.1, 1500)
+    glTranslatef(150, 150, -500)
     glRotatef(0, 0, 0, 1)
     
     first = True
@@ -99,13 +99,20 @@ def main():
                 if np.linalg.norm(p0 - p1) > 50:
                     w = display[0]
                     h = display[1]
-                    v0 = np.array([2.0*p0[0]/w-1, -2.0*p0[1]/h+1, 1])
-                    v1 = np.array([2.0*p1[0]/w-1, -2.0*p1[1]/h+1, 1])
+                    c_x = (w - 1) / 2
+                    c_y = (h - 1) / 2
+                    #v0 = np.array([2.0*p0[0]/w-1, -2.0*p0[1]/h+1, 1])
+                    #v1 = np.array([2.0*p1[0]/w-1, -2.0*p1[1]/h+1, 1])
+                    v0 = np.array([float(p0[0] - c_x)/w, float(p0[1] - c_y)/h, 1.3])
+                    v1 = np.array([float(p1[0] - c_x)/w, float(p1[1] - c_y)/h, 1.3])
+                    #if np.dot(v0, v1) > 0.999999:
+                    #    break
                     v0 = v0 / np.linalg.norm(v0)
                     v1 = v1 / np.linalg.norm(v1)
                     axis = np.cross(v0, v1)
+                    axis = axis / np.linalg.norm(axis)
                     angle = np.arccos(np.dot(v0, v1))
-                    glRotatef( angle * 180 / np.pi, *axis)
+                    glRotatef( angle * 180 / np.pi, -axis[0], axis[1], -axis[2])
                     p1 = p0
             elif event.type == pg.MOUSEBUTTONUP:
                 state = 'default'

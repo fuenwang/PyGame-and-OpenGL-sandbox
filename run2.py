@@ -73,6 +73,8 @@ def Img2Sphere(img_name, radius = 128):
     img = cv2.imread(img_name, cv2.IMREAD_COLOR)
     cv2.cvtColor(img, cv2.COLOR_BGR2RGB, img)
     [h, w, _] = img.shape
+    img = cv2.resize(img, (int(w/1.5), int(h/1.5)))
+    [h, w, _] = img.shape
     c_x = (w - 1) / 2.0
     c_y = (h - 1) / 2.0
     #img[:, :w/4, :] = [0, 0, 0]
@@ -89,7 +91,7 @@ def Img2Sphere(img_name, radius = 128):
     x_grid = np.tile(x_range, [h, 1])
     y_grid = np.tile(y_range, [w, 1]).T
     
-    tmp = np.zeros(img.shape, np.float) # store x, y, z
+    tmp = np.zeros(img.shape, np.float32) # store x, y, z
 
     tmp[:, :, 0] = radius * np.cos(x_grid) * np.cos(y_grid)
     tmp[:, :, 1] = radius * np.cos(y_grid) * np.sin(x_grid)
@@ -104,19 +106,19 @@ def Img2Sphere(img_name, radius = 128):
     return points, colors
 
 def main():
-    [points, colors] = Img2Sphere('image.jpg', 128)
+    [points, colors] = Img2Sphere('image.jpg', 10000)
     #exit()
     #data = Read('reconstruction.json')
     #[points, colors] = InitMap(data)
 
     pg.init()
-    display = (1920, 980)
+    display = (1080, 720)
     pg.display.set_mode(display, DOUBLEBUF | OPENGL)
     
-    gluPerspective(90, float(display[0]) / display[1], 0.1, 1000)
+    gluPerspective(90, float(display[0]) / display[1], 0.1, 100000)
     #glTranslatef(0, 0, -500)
     #glRotatef(0, 0, 0, 0)
-    gluLookAt(0, 0, 0, 0, -1, 0, 0, 0, 1)
+    gluLookAt(0, 0, 3000, 0, 0, -1, 1, 0, 0)
     
     first = True
     state = 'default'

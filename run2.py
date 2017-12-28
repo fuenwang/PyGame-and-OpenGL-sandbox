@@ -7,7 +7,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 
-vertices= (
+vertices = (
     (1, -1, -1),
     (1, 1, -1),
     (-1, 1, -1),
@@ -16,22 +16,23 @@ vertices= (
     (1, 1, 1),
     (-1, -1, 1),
     (-1, 1, 1)
-    )
+)
 
 edges = (
-    (0,1),
-    (0,3),
-    (0,4),
-    (2,1),
-    (2,3),
-    (2,7),
-    (6,3),
-    (6,4),
-    (6,7),
-    (5,1),
-    (5,4),
-    (5,7)
-    )
+    (0, 1),
+    (0, 3),
+    (0, 4),
+    (2, 1),
+    (2, 3),
+    (2, 7),
+    (6, 3),
+    (6, 4),
+    (6, 7),
+    (5, 1),
+    (5, 4),
+    (5, 7)
+)
+
 
 def Read(f_name):
     with open(f_name) as f:
@@ -39,10 +40,11 @@ def Read(f_name):
 
     return data['points']
 
+
 def Map1(data):
     glBegin(GL_POINTS)
     for idx, val in data.items():
-        #print val
+        # print val
         pt = val['coordinates']
         color = val['color']
         color = [float(x) / 255 for x in color]
@@ -50,17 +52,19 @@ def Map1(data):
         glVertex3f(*pt)
     glEnd()
 
+
 def InitMap(data):
     points = []
     colors = []
     for idx, val in data.items():
-        #print val
+        # print val
         pt = val['coordinates']
         color = val['color']
         color = [float(x) / 255 for x in color]
         points.append(pt)
         colors.append(color)
     return points, colors
+
 
 def Cube():
     glBegin(GL_LINES)
@@ -69,11 +73,18 @@ def Cube():
         glVertex3f(*vertices[edge[1]])
     glEnd()
 
-def Img2Sphere(img_name, radius = 128):
+
+def Img2Sphere(img_name, radius=128):
+    colors = None
+    points = np.load('t.npy')
+    #print points.tolist()
+    #exit()
+    #return points.tolist(), np.zeros(points.shape) + 1
+
     img = cv2.imread(img_name, cv2.IMREAD_COLOR)
     cv2.cvtColor(img, cv2.COLOR_BGR2RGB, img)
     [h, w, _] = img.shape
-    img = cv2.resize(img, (int(w/1.5), int(h/1.5)))
+    img = cv2.resize(img, (int(w / 2), int(h / 2)))
     [h, w, _] = img.shape
     c_x = (w - 1) / 2.0
     c_y = (h - 1) / 2.0
@@ -83,15 +94,15 @@ def Img2Sphere(img_name, radius = 128):
     x_range = -(np.arange(0, w) - c_x) / c_x * np.pi
     #x_range[x_range > np.pi / 2] = (np.pi / 2) - (x_range[x_range > np.pi / 2] - np.pi / 2)
     #x_range[x_range < -np.pi / 2] = (-np.pi / 2) - (x_range[x_range < -np.pi / 2] + np.pi / 2)
-    #id1 = np.arange(len(x_range))[x_range > np.pi / 2] 
+    #id1 = np.arange(len(x_range))[x_range > np.pi / 2]
     #id2 = np.arange(len(x_range))[x_range < -np.pi / 2]
 
     y_range = -((np.arange(0, h) - c_y) / c_y * np.pi / 2)
 
     x_grid = np.tile(x_range, [h, 1])
     y_grid = np.tile(y_range, [w, 1]).T
-    
-    tmp = np.zeros(img.shape, np.float32) # store x, y, z
+
+    tmp = np.zeros(img.shape, np.float32)  # store x, y, z
 
     tmp[:, :, 0] = radius * np.cos(x_grid) * np.cos(y_grid)
     tmp[:, :, 1] = radius * np.cos(y_grid) * np.sin(x_grid)
@@ -100,33 +111,39 @@ def Img2Sphere(img_name, radius = 128):
     #tmp[:, id2, 1] *= -1
     tmp[:, :, 2] = radius * np.sin(y_grid)
     #tmp = np.round(tmp).astype(np.int)
-    points = tmp.reshape([h*w, 3])
-    colors = img.reshape([h*w, 3]) / 255.0
-    #print tmp[:, 3*w/4, :]
+    points = tmp.reshape([h * w, 3])
+    colors = img.reshape([h * w, 3]) / 255.0
+    # print tmp[:, 3*w/4, :]
     return points, colors
 
+
 def main():
-    [points, colors] = Img2Sphere('image.jpg', 10000)
-    #exit()
+
+    #[points, colors] = Img2Sphere('pano_dqdfXHzr6Pt7z76KDohVmg.jpg', 128)
+    [points, colors] = Img2Sphere('image.jpg', 128)
+    #[points, colors] = Img2Sphere('/Users/fu-en.wang/Project/BirdViewStitch/pano/pano_00050_7.jpg', 128)
+    # exit()
     #data = Read('reconstruction.json')
     #[points, colors] = InitMap(data)
 
     pg.init()
     display = (1080, 720)
     pg.display.set_mode(display, DOUBLEBUF | OPENGL)
-    
-    gluPerspective(90, float(display[0]) / display[1], 0.1, 100000)
-    #glTranslatef(0, 0, -500)
+
+    gluPerspective(120, float(display[0]) / display[1], 0.1, 100000)
+    #glTranslatef(0, 0, -300)
     #glRotatef(0, 0, 0, 0)
-    gluLookAt(0, 0, 3000, 0, 0, -1, 1, 0, 0)
-    
+
+    #gluLookAt(0, 150, 0, 0, 0, 0, 0, 0, 1)
+    gluLookAt(0, 0, 0, 1, 0, 0, 0, 0, 1)
+
     first = True
     state = 'default'
     while True:
         for event in pg.event.get():
-            #print event.type
+            # print event.type
             if event.type == pg.QUIT:
-                #pass
+                # pass
                 pg.quit()
                 quit()
             elif event.type == pg.MOUSEBUTTONDOWN:
@@ -143,16 +160,18 @@ def main():
                     c_y = (h - 1) / 2
                     #v0 = np.array([2.0*p0[0]/w-1, -2.0*p0[1]/h+1, 1])
                     #v1 = np.array([2.0*p1[0]/w-1, -2.0*p1[1]/h+1, 1])
-                    v0 = np.array([float(p0[0] - c_x)/w, float(p0[1] - c_y)/h, 1.3])
-                    v1 = np.array([float(p1[0] - c_x)/w, float(p1[1] - c_y)/h, 1.3])
-                    #if np.dot(v0, v1) > 0.999999:
+                    v0 = np.array(
+                        [float(p0[0] - c_x) / w, float(p0[1] - c_y) / h, 1.3])
+                    v1 = np.array(
+                        [float(p1[0] - c_x) / w, float(p1[1] - c_y) / h, 1.3])
+                    # if np.dot(v0, v1) > 0.999999:
                     #    break
                     v0 = v0 / np.linalg.norm(v0)
                     v1 = v1 / np.linalg.norm(v1)
                     axis = np.cross(v0, v1)
                     axis = axis / np.linalg.norm(axis)
                     angle = np.arccos(np.dot(v0, v1))
-                    glRotatef( angle * 180 / np.pi, -axis[0], axis[1], -axis[2])
+                    glRotatef(angle * 180 / np.pi, -axis[0], axis[1], -axis[2])
                     p1 = p0
             elif event.type == pg.MOUSEBUTTONUP:
                 state = 'default'
@@ -169,28 +188,8 @@ def main():
             first = False
         else:
             glDrawArrays(GL_POINTS, 0, len(points))
-            
+
         pg.display.flip()
         pg.time.wait(100)
 
 main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

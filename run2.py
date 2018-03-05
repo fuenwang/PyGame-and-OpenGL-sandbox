@@ -134,8 +134,8 @@ def main():
     #glTranslatef(0, 0, -300)
     #glRotatef(0, 0, 0, 0)
 
-    #gluLookAt(0, 150, 0, 0, 0, 0, 0, 0, 1)
-    gluLookAt(0, 0, 0, 1, 0, 0, 0, 0, 1)
+    gluLookAt(0, 150, 0, 0, 0, 0, 0, 0, 1)
+    #gluLookAt(0, 0, 0, 1, 0, 0, 0, 0, 1)
 
     first = True
     state = 'default'

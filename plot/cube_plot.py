@@ -145,7 +145,7 @@ if __name__ == '__main__':
     
     path = '/media/external/Fu-En.Wang/Data/360/final/rotated/023096db053da27b50cd745ececa2257/3.txt'
     #grid = e2c.GetGrid().view(-1, 3).data.cpu().numpy()
-    color = (cv2.imread('%s/2_color.png'%path, cv2.IMREAD_COLOR))
+    color = (cv2.imread('%s/0_depth.png'%path, cv2.IMREAD_COLOR))
     color = cv2.cvtColor(color, cv2.COLOR_BGR2RGB) / 255.0
     color = e2c.ToCubeTensor(torch.FloatTensor(color.reshape(1, 512, 1024, 3).swapaxes(1, 3).swapaxes(2, 3)).cuda())
     color = color.transpose(1, 3).transpose(1, 2).data.cpu().numpy()

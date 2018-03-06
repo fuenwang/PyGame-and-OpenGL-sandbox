@@ -28,10 +28,10 @@ def plot_grid(img):
 
 def main():
     path = '/media/external/Fu-En.Wang/Data/360/final/rotated/023096db053da27b50cd745ececa2257/3.txt'
-    color = (cv2.imread('%s/0_color.png'%path, cv2.IMREAD_COLOR))
+    color = (cv2.imread('%s/2_color.png'%path, cv2.IMREAD_COLOR))
     #color = (cv2.imread('../image.jpg', cv2.IMREAD_COLOR))
     color = cv2.resize(color, (6000, 3000))
-    plot_grid(color)
+    #plot_grid(color)
     #cv2.namedWindow('GG')
     #cv2.imshow('GG', color)
     #cv2.waitKey()
@@ -64,12 +64,13 @@ def main():
 
     gluPerspective(95, float(display[0]) / display[1], 0.1, 100000)
     # for tgt 2.png
-    #p = np.array([-2, 0, 2.5])
-    #p = p / np.linalg.norm(p) * 256
-    #gluLookAt(p[0], 0, p[2], 0, 0, 0, 0, -1, 0)
-    p = np.array([-1, 0, 2.5])
+    p = np.array([-2, 0, 2.5])
     p = p / np.linalg.norm(p) * 256
     gluLookAt(p[0], 0, p[2], 0, 0, 0, 0, -1, 0)
+    # for ref 0.png
+    #p = np.array([-1, 0, 2.5])
+    #p = p / np.linalg.norm(p) * 256
+    #gluLookAt(p[0], 0, p[2], 0, 0, 0, 0, -1, 0)
 
     
     first = True

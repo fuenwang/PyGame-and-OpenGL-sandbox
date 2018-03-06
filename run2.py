@@ -127,7 +127,7 @@ def main():
     #[points, colors] = InitMap(data)
 
     pg.init()
-    display = (720, 720)
+    display = (800, 800)
     pg.display.set_mode(display, DOUBLEBUF | OPENGL)
     #'''
     glEnable(GL_DEPTH_TEST)
@@ -136,12 +136,12 @@ def main():
     glEnable (GL_BLEND)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     #'''
-    gluPerspective(120, float(display[0]) / display[1], 0.1, 100000)
+    gluPerspective(95, float(display[0]) / display[1], 0.1, 100000)
     #glTranslatef(0, 0, -300)
     #glRotatef(0, 0, 0, 0)
 
-    gluLookAt(0, 200, 0, 0, 0, 0, 0, 0, 1)
-    #gluLookAt(0, 0, 0, 1, 0, 0, 0, 0, 1)
+    #gluLookAt(0, 200, 0, 0, 0, 0, 0, 0, 1)
+    gluLookAt(0, 0, 0, 1, 0, 0, 0, 0, 1)
 
     first = True
     state = 'default'

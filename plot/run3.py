@@ -73,6 +73,7 @@ def load_shaders(vert_url, frag_url):
 
 def CubeTexture(color, order):
     # color is 6 x w x w x 3
+    '''
     lst = [
             GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
             GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
@@ -81,6 +82,16 @@ def CubeTexture(color, order):
             GL_TEXTURE_CUBE_MAP_POSITIVE_X,
             GL_TEXTURE_CUBE_MAP_POSITIVE_Y
         ]
+    '''
+    lst = [
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+            GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+            GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+        ]
+
     ID = glGenTextures(1)
     glActiveTexture(GL_TEXTURE0)
     glBindTexture(GL_TEXTURE_CUBE_MAP, ID)
@@ -88,9 +99,9 @@ def CubeTexture(color, order):
         #i = 5
         cube = color[i, :, :, :]
         #if j == 0:
-        cube = cv2.flip(cube, 1)
+        #cube = cv2.flip(cube, 1)
         glTexImage2D(
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, GL_RGB, cube.shape[0], cube.shape[0], 0,
+                lst[i], 0, GL_RGB, cube.shape[0], cube.shape[0], 0,
                 GL_RGB, GL_FLOAT, cube
             )
         '''
@@ -121,55 +132,35 @@ if __name__ == '__main__':
     e2c = E2C(1, 512, 1024, cube, 90, RADIUS=128)
     er = ER(512, 1024, RADIUS=128)
     
+    #grid = e2c.GetGrid().view(-1, 3).data.cpu().numpy()
     color = (cv2.imread('0_color.png', cv2.IMREAD_COLOR))
     color = cv2.cvtColor(color, cv2.COLOR_BGR2RGB) / 255.0
     color = e2c.ToCubeTensor(torch.FloatTensor(color.reshape(1, 512, 1024, 3).swapaxes(1, 3).swapaxes(2, 3)).cuda())
     color = color.transpose(1, 3).transpose(1, 2).data.cpu().numpy()
-    order = [4, 3, 5, 1, 2, 0]
-    order = [3, 4, 5, 1, 2, 0]
-    gg = []
-    for i in order:
-        gg.append(color[i, :, :, :][np.newaxis, :, :, :])
-    color = np.concatenate(gg, axis=0)
     color[:, 0:8, :, :]  = 0
     color[:, :, 0:8, :]  = 0
     color[:, -7:, :, :]  = 0
     color[:, :, -7:, :]  = 0
-    #color[0, :, :, :] = 0
-    idx = 0
-    tmp = color[idx, :, :, :].copy()
-    print tmp
-    skybox_right = [1, -1, -1, 1, -1,  1, 1,  1,  1, 1,  1,  1, 1,  1, -1, 1, -1, -1]
-    skybox_left = [-1, -1,  1, -1, -1, -1, -1,  1, -1, -1,  1, -1, -1,  1,  1, -1, -1,  1]
-    skybox_top = [-1,  1, -1, 1,  1, -1, 1,  1,  1, 1,  1,  1, -1,  1,  1, -1,  1, -1]
-    skybox_bottom = [-1, -1, -1, -1, -1,  1, 1, -1, -1, 1, -1, -1, -1, -1,  1, 1, -1,  1]
-    skybox_back = [-1,  1, -1, -1, -1, -1, 1, -1, -1, 1, -1, -1, 1,  1, -1, -1,  1, -1]
-    skybox_front = [-1, -1,  1, -1,  1,  1, 1,  1,  1, 1,  1,  1, 1, -1,  1, -1, -1,  1]
-    skybox_vertices = np.array([skybox_back, skybox_bottom, skybox_front, skybox_left, skybox_right, skybox_top], np.float32).flatten().reshape([-1, 3])*3
-    #skybox_vertices[:, 2] *= -1
-    #print skybox_vertices.shape
+
     pg.init()
     display = (1080, 1080)
     pg.display.set_mode(display, DOUBLEBUF | OPENGL)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_TEXTURE_2D)
-    glEnable(GL_TEXTURE_CUBE_MAP)
-    glEnable (GL_BLEND)
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    #glEnable(GL_TEXTURE_CUBE_MAP)
+    #glEnable (GL_BLEND)
 
     gluPerspective(90, float(display[0]) / display[1], 0.1, 100000)
-    s = np.array([9, 7, 13]) / 1.3
-    gluLookAt(s[0], s[1], s[2], 0, 0, 1, 0, 1, 0)
+    #s = np.array([9, 7, 13]) / 1.3
+    #gluLookAt(s[0], s[1], s[2], 0, 0, 1, 0, 1, 0)
+    #glMatrixMode(GL_PROJECTION)
+    gluLookAt(0, 0, -5, 0, 0, 0, 0, -1, 0)
     flag = True
     state = 'default'
 
-    program = load_shaders("./skybox.vert", "./skybox.frag")
-    skybox_vbo = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo)
-    glBufferData(GL_ARRAY_BUFFER, skybox_vertices.nbytes, skybox_vertices, GL_STATIC_DRAW)
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
+    #program = load_shaders("./skybox.vert", "./skybox.frag")
     
-    ID = CubeTexture(color, order)
+    ID = CubeTexture(color, order=range(color.shape[0]))
 
     while True:
         for event in pg.event.get():
@@ -213,19 +204,39 @@ if __name__ == '__main__':
         #glVertexPointer(3, GL_FLOAT, 0, np.array(CUBE, np.float32).reshape([-1, 3]))
         #glDrawArrays(GL_QUADS, 0, 24)
         #'''
-        glUseProgram(program)
-        #glDepthMask(GL_FALSE)
+        #glUseProgram(program)
         glBindTexture(GL_TEXTURE_CUBE_MAP, ID)
         glEnableClientState(GL_VERTEX_ARRAY)
-        glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo)
-        glVertexPointer(3, GL_FLOAT, 0, None)
-        glDrawArrays(GL_TRIANGLES, 0, 36)
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
-        glDisableClientState(GL_VERTEX_ARRAY)
-        glBindTexture(GL_TEXTURE_CUBE_MAP, 0)
-        #glDepthMask(GL_TRUE)
+        pts = np.array(CUBE, np.float32)
+        #tmp1 = pts[:, 1, :].copy()
+        #tmp2 = pts[:, 3, :].copy()
+        #pts[:, 1, :] = tmp2
+        #pts[:, 3, :] = tmp1
+        '''
+        tmp = []
+        for i in range(3, -1, -1):
+            tmp.append(pts[:, i:i+1, :])
+        pts = np.concatenate(tmp, axis=1)
+        #pts[:, 1] *= -1
+        #pts[:, 2] *= -1
+        glVertexPointer(3, GL_FLOAT, 0, pts.reshape([-1, 3]))
+        glDrawArrays(GL_QUADS, 0, 24)
         glUseProgram(0)
-        #'''
+        '''
+        glLineWidth(5)
+        glBegin(GL_LINES)
+        glColor4f(1, 0, 0, 1)
+        glVertex3f(0, 0, 0)
+        glVertex3f(10, 0, 0)
+
+        glColor4f(0, 1, 0, 1)
+        glVertex3f(0, 0, 0)
+        glVertex3f(0, 10, 0)
+
+        glColor4f(0, 0, 1, 1)
+        glVertex3f(0, 0, 0)
+        glVertex3f(0, 0, 10)
+        glEnd()
         '''
         glBindTexture(GL_TEXTURE_CUBE_MAP, ID)
         glEnableClientState(GL_VERTEX_ARRAY)

@@ -143,8 +143,9 @@ if __name__ == '__main__':
     e2c = E2C(1, 512, 1024, cube, 90, RADIUS=128)
     er = ER(512, 1024, RADIUS=128)
     
+    path = '/media/external/Fu-En.Wang/Data/360/final/rotated/023096db053da27b50cd745ececa2257/3.txt'
     #grid = e2c.GetGrid().view(-1, 3).data.cpu().numpy()
-    color = (cv2.imread('0_color.png', cv2.IMREAD_COLOR))
+    color = (cv2.imread('%s/2_color.png'%path, cv2.IMREAD_COLOR))
     color = cv2.cvtColor(color, cv2.COLOR_BGR2RGB) / 255.0
     color = e2c.ToCubeTensor(torch.FloatTensor(color.reshape(1, 512, 1024, 3).swapaxes(1, 3).swapaxes(2, 3)).cuda())
     color = color.transpose(1, 3).transpose(1, 2).data.cpu().numpy()
@@ -154,7 +155,7 @@ if __name__ == '__main__':
     #color[:, :, -4:, :]  = 0
 
     pg.init()
-    display = (800, 800)
+    display = (1080, 1080)
     pg.display.set_mode(display, DOUBLEBUF | OPENGL)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glEnable (GL_BLEND)
@@ -171,7 +172,7 @@ if __name__ == '__main__':
     #gluLookAt(s[0], s[1], s[2], 0, 0, 1, 0, 1, 0)
     #glMatrixMode(GL_PROJECTION)
     #gluLookAt(-3, -2, 3, 0, 0, 0, 0, -1, 0)
-    gluLookAt(-2, -2, 3, 0, 0, 0, 0, -1, 0)
+    gluLookAt(-2.6, -2, 2.5, 0, 0, 0, 0, -1, 0)
     #gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0)
 
     flag = True
@@ -228,7 +229,10 @@ if __name__ == '__main__':
         #glEnableClientState(GL_VERTEX_ARRAY)
         pts = np.array(CUBE, np.float32)*1
         glEnable(GL_TEXTURE_2D)
-        CubeTexture(color, range(color.shape[0]))
+
+        ID = CubeTexture(color, range(color.shape[0]))
+
+        glDeleteTextures(ID)
         #glBindTexture(GL_TEXTURE_CUBE_MAP, 0)
         glDisable(GL_TEXTURE_2D)
         glLineWidth(4)

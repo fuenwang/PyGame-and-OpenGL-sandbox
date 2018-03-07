@@ -145,7 +145,7 @@ if __name__ == '__main__':
     
     path = '/media/external/Fu-En.Wang/Data/360/final/rotated/023096db053da27b50cd745ececa2257/3.txt'
     #grid = e2c.GetGrid().view(-1, 3).data.cpu().numpy()
-    color = (cv2.imread('%s/0_depth.png'%path, cv2.IMREAD_COLOR))
+    color = (cv2.imread('%s/2_depth.png'%path, cv2.IMREAD_COLOR))
     color = cv2.cvtColor(color, cv2.COLOR_BGR2RGB) / 255.0
     color = e2c.ToCubeTensor(torch.FloatTensor(color.reshape(1, 512, 1024, 3).swapaxes(1, 3).swapaxes(2, 3)).cuda())
     color = color.transpose(1, 3).transpose(1, 2).data.cpu().numpy()
@@ -172,7 +172,10 @@ if __name__ == '__main__':
     #gluLookAt(s[0], s[1], s[2], 0, 0, 1, 0, 1, 0)
     #glMatrixMode(GL_PROJECTION)
     #gluLookAt(-3, -2, 3, 0, 0, 0, 0, -1, 0)
-    gluLookAt(-2.6, -2, 2.5, 0, 0, 0, 0, -1, 0)
+
+    p = [-0.65, -0.4, 1]
+    p = np.array(p, np.float32) / np.linalg.norm(p) * 5
+    gluLookAt(p[0], p[1], p[2], 0, 0, 0, 0, -1, 0)
     #gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0)
 
     flag = True
@@ -309,5 +312,5 @@ if __name__ == '__main__':
         print 'ggg'
         '''
         pg.display.flip()
-        pg.time.wait(100)
+        pg.time.wait(60)
         #exit()

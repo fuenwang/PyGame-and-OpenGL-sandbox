@@ -27,10 +27,11 @@ def plot_grid(img):
         cv2.line(img, (pos[i], 0), (pos[i], h-1), color=(0, 0, 0), thickness=13)
 
 def main():
-    idx = 0
+    idx = 10
     shape = (2048, 1024)
     #shape = (600, 300)
-    path = '/media/external/Fu-En.Wang/Data/360/final/rotated/023096db053da27b50cd745ececa2257/3.txt'
+    #path = '/media/external/Fu-En.Wang/Data/360/final/rotated/023096db053da27b50cd745ececa2257/3.txt'
+    path = '/media/external/Fu-En.Wang/Data/360/final/rotated/147762e9a81cd45791a4dd953ef792ca/0.txt'
     color = (cv2.imread('%s/%d_color.png'%(path, idx), cv2.IMREAD_COLOR))
     color = cv2.resize(color, shape)
     color = cv2.cvtColor(color, cv2.COLOR_BGR2RGB) / 255.0
@@ -65,7 +66,7 @@ def main():
 
     gluPerspective(80, float(display[0]) / display[1], 0.1, 100000)
     # for tgt 2.png
-    gluLookAt(0, -100, 0,  0, 0, 0,  0, 0, 1)
+    gluLookAt(0, -30, 0,  0, 0, 0,  0, 0, 1)
     # for ref 0.png
     #p = np.array([-1, 0, 2.5])
     #p = p / np.linalg.norm(p) * 256
@@ -116,7 +117,7 @@ def main():
         #glClearColor(0, 0, 0, 0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
-        glPointSize(5)
+        glPointSize(1)
         glDrawArrays(GL_POINTS, 0, grid.shape[0])
         
         pg.display.flip()
